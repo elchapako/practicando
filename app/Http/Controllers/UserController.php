@@ -28,6 +28,13 @@ class UserController extends Controller
 
     public function store()
     {
-        return 'Procesando información...';
+        $data = request()->all();
+
+        User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password'])
+        ]);
+        return redirect()->route('users');
     }
 }
