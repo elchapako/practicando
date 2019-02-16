@@ -26,18 +26,11 @@ class UserSeeder extends Seeder
            'is_admin' => true,
         ]);
 
-        User::create([
-            'name' => 'otro usuario',
-            'email' => 'otro@tooducks.com',
-            'password' => bcrypt('laravel'),
-            'profession_id' => $professionId,
+        factory(User::class)->create([
+            'profession_id' => $professionId
         ]);
 
-        User::create([
-            'name' => 'otro usuario',
-            'email' => 'usuario@tooducks.com',
-            'password' => bcrypt('laravel'),
-            'profession_id' => null,
-        ]);
+        factory(User::class)->create();
+
     }
 }
