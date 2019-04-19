@@ -95,9 +95,75 @@ class UsersModuleTest extends TestCase
 
         $this->assertEquals(0, User::count());
 
-    //    $this->assertDatabaseMissing('users', [
-    //       'email' => 'edwin.ibanez@tooducks.com'
-    //    ]);
     }
 
+    /** @test */
+    function the_email_is_required()
+    {
+        //$this->withoutExceptionHandling();
+
+        $this->from('usuarios/nuevo')
+            ->post('/usuarios', [
+                'name' => 'Edwin',
+                'email' => '',
+                'password' => '123456'
+            ]   )->assertRedirect('usuarios/nuevo')
+            ->assertSessionHasErrors(['email' => 'El campo email es obligatorio']);
+
+        $this->assertEquals(0, User::count());
+
+    }
+
+    /** @test */
+    function the_email_must_be_valid()
+    {
+        //$this->withoutExceptionHandling();
+
+        $this->from('usuarios/nuevo')
+            ->post('/usuarios', [
+                'name' => 'Edwin',
+                'email' => 'correo-no-valido',
+                'password' => '123456'
+            ]   )->assertRedirect('usuarios/nuevo')
+            ->assertSessionHasErrors(['email']);
+
+        $this->assertEquals(0, User::count());
+
+    }
+
+    /** @test */
+    function the_email_must_be_unique()
+    {
+        factory(User::class)->create([
+           'email' => 'edwin.ibanez@tooducks.com'
+        ]);
+
+        $this->from('usuarios/nuevo')
+            ->post('/usuarios', [
+                'name' => 'Edwin',
+                'email' => 'edwin.ibanez@tooducks.com',
+                'password' => '123456'
+            ]   )->assertRedirect('usuarios/nuevo')
+            ->assertSessionHasErrors(['email']);
+
+        $this->assertEquals(1, User::count());
+
+    }
+
+    /** @test */
+    function the_password_is_required()
+    {
+        //$this->withoutExceptionHandling();
+
+        $this->from('usuarios/nuevo')
+            ->post('/usuarios', [
+                'name' => 'Edwin',
+                'email' => 'el.chapako@gmail.com',
+                'password' => ''
+            ]   )->assertRedirect('usuarios/nuevo')
+            ->assertSessionHasErrors(['password' => 'El campo password es obligatorio']);
+
+        $this->assertEquals(0, User::count());
+
+    }
 }
