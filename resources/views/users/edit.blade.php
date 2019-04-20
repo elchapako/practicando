@@ -16,8 +16,9 @@
         </div>
     @endif
 
-    <form method="post" action="{{ url('usuarios') }}">
-        {!! csrf_field() !!}
+    <form method="post" action="{{ url("usuarios/{$user->id}") }}">
+        {{ method_field('put') }}
+        {{ csrf_field() }}
 
         <label for="name">Nombre:</label>
         <input type="text" name="name" id="name" placeholder="Pedro Perez" value="{{old('name', $user->name)}}">
