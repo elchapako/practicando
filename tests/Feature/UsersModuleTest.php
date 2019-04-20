@@ -43,7 +43,7 @@ class UsersModuleTest extends TestCase
            'name' => 'Edwin Ibañez'
         ]);
 
-        $this->get('usuarios/'.$user->id)
+        $this->get("/usuarios/{$user->id}")
             ->assertStatus(200)
             ->assertSee('Edwin Ibañez');
     }
@@ -181,6 +181,26 @@ class UsersModuleTest extends TestCase
             ->assertViewHas('user', function ($viewUser) use ($user){
                 return $viewUser->id === $user->id;
             });
+    }
+
+    /** @test */
+    function it_updates_a_user()
+    {
+        $user = factory(User::class)->create();
+
+        //$this->withoutExceptionHandling();
+
+        $this->put("/usuarios/{$user->id}", [
+            'name' => 'Edwin',
+            'email' => 'edwin.ibanez@tooducks.com',
+            'password' => '123456'
+        ])->assertRedirect("/usuarios/{$user->id}");
+
+        $this->assertCredentials([
+            'name' => 'Edwin',
+            'email' => 'edwin.ibanez@tooducks.com',
+            'password' => '123456',
+        ]);
     }
 
 }
