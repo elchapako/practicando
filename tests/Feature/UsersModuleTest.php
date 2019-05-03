@@ -312,7 +312,7 @@ class UsersModuleTest extends TestCase
     /** @test */
     function it_deletes_a_user()
     {
-        $this->withoutExceptionHandling();
+        //$this->withoutExceptionHandling();
 
         $user = factory(User::class)->create();
 

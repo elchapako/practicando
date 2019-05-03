@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::get('/usuarios', 'UserController@index')
-    ->name('users.index');
+    ->name('users');
 
 Route::get('/usuarios/{user}', 'UserController@show')
     ->where('user', '[0-9]+')
@@ -32,4 +32,4 @@ Route::put('/usuarios/{user}', 'UserController@update');
 
 Route::get('/saludo/{name}/{nickname?}', 'WelcomeUserController');
 
-Route::delete('/usuarios/{user}', 'UserController@destroy');
+Route::delete('/usuarios/{user}', 'UserController@destroy')->name('users.destroy');
