@@ -91,34 +91,50 @@ class UsersModuleTest extends TestCase
     }
 
     /** @test */
+    function the_twitter_field_is_optional()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->post('/usuarios', $this->getValidData([
+            'twitter' => null
+        ]))->assertRedirect(route('users'));
+
+        $this->assertCredentials([
+            'name' => 'Edwin',
+            'email' => 'edwin.ibanez@tooducks.com',
+            'password' => '123456',
+        ]);
+
+        $this->assertDatabaseHas('user_profiles', [
+            'bio' => 'Programador de Laravel y Vue.js',
+            'twitter' => null,
+            'user_id' => User::findByEmail('edwin.ibanez@tooducks.com')->id,
+        ]);
+    }
+
+    /** @test */
     function the_name_is_required()
     {
         $this->from('usuarios/nuevo')
-            ->post('/usuarios', [
+            ->post('/usuarios', $this->getValidData([
                 'name' => '',
-                'email' => 'edwin.ibanez@tooducks.com',
-                'password' => '123456'
-        ]   )->assertRedirect('usuarios/nuevo')
+            ]))->assertRedirect('usuarios/nuevo')
             ->assertSessionHasErrors(['name' => 'El campo nombre es obligatorio']);
 
-        $this->assertEquals(0, User::count());
+        $this->assertDatabaseEmpty('users');
 
     }
 
     /** @test */
     function the_email_is_required()
     {
-        //$this->withoutExceptionHandling();
-
         $this->from('usuarios/nuevo')
-            ->post('/usuarios', [
-                'name' => 'Edwin',
+            ->post('/usuarios', $this->getValidData([
                 'email' => '',
-                'password' => '123456'
-            ]   )->assertRedirect('usuarios/nuevo')
+            ]))->assertRedirect('usuarios/nuevo')
             ->assertSessionHasErrors(['email' => 'El campo email es obligatorio']);
 
-        $this->assertEquals(0, User::count());
+        $this->assertDatabaseEmpty('users');
 
     }
 
@@ -128,14 +144,12 @@ class UsersModuleTest extends TestCase
         //$this->withoutExceptionHandling();
 
         $this->from('usuarios/nuevo')
-            ->post('/usuarios', [
-                'name' => 'Edwin',
+            ->post('/usuarios', $this->getValidData([
                 'email' => 'correo-no-valido',
-                'password' => '123456'
-            ]   )->assertRedirect('usuarios/nuevo')
+            ]))->assertRedirect('usuarios/nuevo')
             ->assertSessionHasErrors(['email']);
 
-        $this->assertEquals(0, User::count());
+        $this->assertDatabaseEmpty('users');
 
     }
 
@@ -147,11 +161,9 @@ class UsersModuleTest extends TestCase
         ]);
 
         $this->from('usuarios/nuevo')
-            ->post('/usuarios', [
-                'name' => 'Edwin',
-                'email' => 'edwin.ibanez@tooducks.com',
-                'password' => '123456'
-            ]   )->assertRedirect('usuarios/nuevo')
+            ->post('/usuarios', $this->getValidData([
+                'email' => 'edwin.ibanez@tooducks.com'
+            ]))->assertRedirect('usuarios/nuevo')
             ->assertSessionHasErrors(['email']);
 
         $this->assertEquals(1, User::count());
@@ -161,17 +173,13 @@ class UsersModuleTest extends TestCase
     /** @test */
     function the_password_is_required()
     {
-        //$this->withoutExceptionHandling();
-
         $this->from('usuarios/nuevo')
-            ->post('/usuarios', [
-                'name' => 'Edwin',
-                'email' => 'el.chapako@gmail.com',
-                'password' => ''
-            ]   )->assertRedirect('usuarios/nuevo')
+            ->post('/usuarios', $this->getValidData([
+                'password' => '',
+            ]))->assertRedirect('usuarios/nuevo')
             ->assertSessionHasErrors(['password' => 'El campo password es obligatorio']);
 
-        $this->assertEquals(0, User::count());
+        $this->assertDatabaseEmpty('users');
 
     }
 
@@ -332,6 +340,17 @@ class UsersModuleTest extends TestCase
         ]);
 
         //$this->assertSame(0, User::count());
+    }
+
+    protected function getValidData(array $custom = [])
+    {
+        return array_filter(array_merge([
+            'name' => 'Edwin',
+            'email' => 'edwin.ibanez@tooducks.com',
+            'password' => '123456',
+            'bio' => 'Programador de Laravel y Vue.js',
+            'twitter' => 'https://twitter.com/elchapako'
+        ], $custom));
     }
 
 }
