@@ -2,6 +2,7 @@
 
 use App\Profession;
 use App\User;
+use App\UserProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -18,19 +19,22 @@ class UserSeeder extends Seeder
 
         $professionId = Profession::where('title', 'Back-end developer')->value('id');
 
-        User::create([
+        $user = User::create([
            'name' => 'Edwin Ibañez',
            'email' => 'edwin.ibanez@tooducks.com',
            'password' => bcrypt('laravel'),
-           'profession_id' => $professionId,
            'is_admin' => true,
         ]);
 
-        factory(User::class)->create([
-            'profession_id' => $professionId
+        $user->profile()->create([
+           'bio' => 'Programador',
+           'profession_id' => $professionId,
         ]);
 
-        factory(User::class, 48)->create();
-
+        factory(User::class, 29)->create()->each(function ($user) {
+            $user->profile()->create(
+                factory(UserProfile::class)->raw()
+            );
+        });
     }
 }
